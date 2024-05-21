@@ -462,6 +462,40 @@
     \end{figure}
 
 
+    \subsection{Листинг для задания 3.}
+    Для построения трехмерного графика я написал код на языке Python с использованием библиотек
+    numpy и matplotlib.
+    \begin{lstlisting}[label=code, caption=Программа для построения трехмерного графика.]
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    x = np.array([0, 1, 2, 3])
+    y = np.array([0, 1, 2, 3])
+    X, Y = np.meshgrid(x, y)
+    Z = np.array([
+        [0, 0, 0, 0],
+        [0, 0, 0, 0.1],
+        [0, 0, 0.4, 0.7],
+        [0, 0.1, 0.7, 1]
+    ])
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    surface = ax.plot_surface(X, Y, Z, cmap='viridis')
+
+    fig.colorbar(surface)
+
+    ax.set_title('Distribution function')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('F(x, y)')
+    ax.set_zlim(0, 1)
+
+    plt.show()
+    \end{lstlisting}
+
+
     \textbf{Ответ: Получена функция распределения F(x, y) и построен ее график.}
 
 
@@ -576,6 +610,254 @@
 
 
     \subsection{Решение.}
+    Гипергеометрическое распределение описывает вероятность $X$ успехов в $n$ выборках без возвращения из конечной совокупности из
+    $N$ элементов, содержащих $K$ успешных и $N-K$ неуспешных элементов. Будем обозначать гипергеометрическое распределение как
+    $$X\sim \text{Hypergeometric}(N,K,n)$$
+    Функция вероятности для гипергеометрического распределения имеет вид:
+    $$
+    P(X=k)=
+    \dfrac{
+        \begin{bmatrix}
+            K\\
+            k
+        \end{bmatrix}
+        \begin{bmatrix}
+            N-K\\
+            n-k
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            n
+        \end{bmatrix}
+    },
+    $$
+    где
+    $
+    \begin{bmatrix}
+        a\\
+        b
+    \end{bmatrix}
+    $
+    -- биномиальный коэффициент, равный
+    $
+    \dfrac{a!}{(a-b)!\,b!}
+    $
 
 
+    Чтобы найти характеристическую функцию, необходимо вычислить математическое ожидание от $e^{itX}$,
+    где $i$ -- мнимая единица, а $t$ -- вещественное число.
+    Характеристическая функция $\varphi_X(t)$ для случайной величины $X$ определяется как:
+    $$
+    \varphi_X(t)=M\left[e^{itX}\right]
+    $$
+    Для гипергеометрического распределения имеем:
+    $$
+    \varphi_X(t)=M\left[e^{itX}\right]=\sum\limits_{k=0}^{n}e^{itk}P(X=k)
+    $$
+    Ранее мы выписали функцию вероятности $P(X=k)$. Подставим ее в выражение выше:
+    $$
+    \varphi_X(t)=\sum\limits_{k=0}^{n}e^{itk}\dfrac{
+        \begin{bmatrix}
+            K\\
+            k
+        \end{bmatrix}
+        \begin{bmatrix}
+            N-K\\
+            n-k
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            n
+        \end{bmatrix}
+    }
+    =\dfrac{1}{
+        \begin{bmatrix}
+            N\\
+            n
+        \end{bmatrix}
+    }
+    \sum\limits_{k=0}^{n}e^{itk}
+    \begin{bmatrix}
+        K\\
+        k
+    \end{bmatrix}
+    \begin{bmatrix}
+        N-K\\
+        n-k
+    \end{bmatrix}
+    $$
+    Для дальнейших вычислений будем использовать метод производящих функций. Пусть $G(z)$
+    -- производящая функция для гипергеометрического распределения:
+    $$
+    G(z)=\sum\limits_{k=0}^{n}P(X=k)z^k
+    $$
+    Известно, что производящую функцию гипергеометрического распределения можно записать как:
+    $$
+    G(z)=\dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }
+    (1+(z-1))^n
+    $$
+    Чтобы получить характеристическую функцию, заменим $z$ на $e^{it}$:
+    $$
+    \varphi_X(t)=G(e^{it})=\dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }(1+(e^{it}-1))^n
+    $$
+    Подставим это выражение в производящую функцию и получим окончательный вид характеристической функции гипергеометрического распределения:
+    $$
+    \varphi_X(t)=\dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }(e^{it})^n
+    =\dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }e^{itn}
+    $$
+    Таким образом, характеристическая функция гипергеометрического распределения $X$ записывается так:
+    $$
+    \varphi_X(t)=
+    \dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }(1+(e^{it}-1))^n
+    $$
+
+
+    Математическое ожидание $M(X)$ можно получить как первую производную характеристической функции по $t$ при $t=0$:
+    $$
+    M[X]=\dfrac{d\varphi_X(t)}{dt}\bigg|_{t=0}
+    $$
+    Для гипергеометрического распределения получим:
+    $$
+    \dfrac{d\varphi_X(t)}{dt}\bigg|_{t=0}=
+    \left(\dfrac{\begin{bmatrix}N-n\\K\end{bmatrix}}{\begin{bmatrix}N\\K\end{bmatrix}}(1+(e^{it}-1))^n\right)^{\prime}_t \Bigg|_{t=0}=
+    \dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }
+    \cdot n \cdot (1+(e^{it}-1))^{n-1}\cdot ie^{it}\Bigg|_{t=0}
+    $$
+    $$
+    \dfrac{d\varphi_X(t)}{dt}\bigg|_{t=0}=
+    \dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }
+    \cdot n \cdot (1+(1-1))^{n-1}\cdot i\cdot 1=
+    \dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }\cdot n \cdot 1 \cdot i =n\dfrac{K}{N}\Rightarrow
+    M(X)=n\dfrac{K}{N}
+    $$
+
+
+    Дисперсию можно найти как вторую производную по $t$ при $t=0$:
+    $$
+    D(X)=\dfrac{d^2\varphi_X(t)}{dt^2}\bigg|_{t=0}-(M[X])^2
+    $$
+    Для гипергеометрического распределения получим:
+    $$
+    \dfrac{d^2\varphi_X(t)}{dt^2}\bigg|_{t=0}=
+    \left(\dfrac{\begin{bmatrix}N-n\\K\end{bmatrix}}{\begin{bmatrix}N\\K\end{bmatrix}}(1+(e^{it}-1))^n\right)^{\prime\prime}_{tt} \Bigg|_{t=0}
+    $$
+    $$
+    \dfrac{d^2\varphi_X(t)}{dt^2}\bigg|_{t=0}=
+    \dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }
+    \cdot n \cdot \left[(1+(e^{it}-1))^{n-1}\cdot i^2e^{2it}+(n-1)(1+(e^{it}-1))^{n-2}\cdot i^2e^{2it}\right]\Bigg|_{t=0}
+    $$
+    $$
+    \dfrac{d^2\varphi_X(t)}{dt^2}\bigg|_{t=0}=
+    \dfrac{
+        \begin{bmatrix}
+            N-n\\
+            K
+        \end{bmatrix}
+    }{
+        \begin{bmatrix}
+            N\\
+            K
+        \end{bmatrix}
+    }
+    \cdot n \cdot \left[1^{n-1}\cdot(-1)+ (n-1)\cdot1^{n-2}\cdot(-1)\right]=n\dfrac{K}{N}\left(1-\dfrac{K}{N}\right)\dfrac{N-n}{N-1}
+    $$
+    $$
+    \dfrac{d^2\varphi_X(t)}{dt^2}\bigg|_{t=0}=
+    n\dfrac{K}{N}\left(1-\dfrac{K}{N}\right)\dfrac{N-n}{N-1}\Rightarrow D(X)=n\dfrac{K}{N}\left(1-\dfrac{K}{N}\right)\dfrac{N-n}{N-1}
+    $$
+
+
+    \textbf{Ответ: что и требовалось найти.}
 \end{document}
